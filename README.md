@@ -176,28 +176,30 @@ client = Eaton::Client.new(
   verify_ssl: true
 )
 
-# Extend with power monitoring
-client.extend(Eaton::Power)
-
 # Get PDU info
-info = client.pdu_info
+info = client.info
 puts "#{info[:model]} - #{info[:serial_number]}"
 
 # Get overall power
-power = client.overall_power
+power = client.power
 puts "Current draw: #{power} watts"
 
 # Get active outlets
-outlets = client.outlet_power
+outlets = client.outlets
 outlets.select { |o| o[:watts] > 0 }.each do |outlet|
   puts "#{outlet[:name]}: #{outlet[:watts]}W"
 end
 
 # Get branch distribution
-branches = client.branch_power
+branches = client.branches
 branches.each do |branch|
   puts "#{branch[:name]}: #{branch[:current]}A @ #{branch[:voltage]}V"
 end
+
+# Get detailed metrics
+detailed = client.detailed
+puts "Power Factor: #{detailed[:overall][:power_factor]}"
+puts "Frequency: #{detailed[:overall][:frequency]} Hz"
 
 # Clean up
 client.logout

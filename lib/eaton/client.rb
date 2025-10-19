@@ -10,6 +10,8 @@ module Eaton
     class AuthenticationError < StandardError; end
     class APIError < StandardError; end
 
+    include Power
+
     attr_reader :host, :username, :base_url
 
     def initialize(host:, username:, password:, port: 443, verify_ssl: false, host_header: nil)

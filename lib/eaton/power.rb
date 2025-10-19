@@ -4,14 +4,14 @@ module Eaton
   module Power
     # Get overall power consumption for the PDU
     # Returns power in watts
-    def overall_power
+    def power
       data = get("/powerDistributions/1/inputs/1")
       data.dig("measures", "activePower")
     end
 
     # Get per-outlet power consumption
     # Returns an array of hashes with outlet info and power in watts
-    def outlet_power
+    def outlets
       # Get list of outlets
       outlets_list = get("/powerDistributions/1/outlets")
       member_count = outlets_list["members@count"] || 0
@@ -41,7 +41,7 @@ module Eaton
     end
 
     # Get detailed power information including voltage, current, and power factor
-    def detailed_power_info
+    def detailed
       input_data = get("/powerDistributions/1/inputs/1")
 
       {
@@ -55,13 +55,13 @@ module Eaton
           cumulated_energy: input_data.dig("measures", "cumulatedEnergy"),
           partial_energy: input_data.dig("measures", "partialEnergy")
         },
-        outlets: outlet_power
+        outlets: outlets
       }
     end
 
     # Get branch power information
     # Returns an array of branch power data
-    def branch_power
+    def branches
       branches_list = get("/powerDistributions/1/branches")
       member_count = branches_list["members@count"] || 0
 
@@ -87,7 +87,7 @@ module Eaton
     end
 
     # Get PDU information
-    def pdu_info
+    def info
       data = get("/powerDistributions/1")
 
       {

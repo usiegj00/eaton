@@ -16,7 +16,7 @@ module Eaton
     desc "power", "Get overall power consumption in watts"
     def power
       with_client do |client|
-        power = client.overall_power
+        power = client.power
         output_result("Overall Power", { watts: power })
       end
     end
@@ -24,7 +24,7 @@ module Eaton
     desc "outlets", "Get per-outlet power consumption"
     def outlets
       with_client do |client|
-        outlets = client.outlet_power
+        outlets = client.outlets
         # Filter out zero-power outlets in text mode
         if options[:format] == "text"
           outlets = outlets.select { |o| o[:watts] && o[:watts] > 0 }
@@ -36,7 +36,7 @@ module Eaton
     desc "detailed", "Get detailed power information"
     def detailed
       with_client do |client|
-        info = client.detailed_power_info
+        info = client.detailed
         # Filter outlets in text mode
         if options[:format] == "text" && info[:outlets]
           info[:outlets] = info[:outlets].select { |o| o[:watts] && o[:watts] > 0 }
@@ -48,7 +48,7 @@ module Eaton
     desc "branches", "Get power consumption per branch"
     def branches
       with_client do |client|
-        branches = client.branch_power
+        branches = client.branches
         # Filter out zero-current branches in text mode
         if options[:format] == "text"
           branches = branches.select { |b| b[:current] && b[:current] > 0 }
@@ -60,7 +60,7 @@ module Eaton
     desc "info", "Display PDU device information"
     def info
       with_client do |client|
-        info = client.pdu_info
+        info = client.info
         output_result("PDU Device Information", info)
       end
     end
@@ -87,9 +87,6 @@ module Eaton
           verify_ssl: options[:verify_ssl],
           host_header: options[:host_header]
         )
-
-        # Mix in the Power module to add power monitoring methods
-        client.extend(Power)
 
         yield client
       rescue Client::AuthenticationError => e
