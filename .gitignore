@@ -1,0 +1,34 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# rspec failure tracking
+.rspec_status
+
+# Gem builds
+*.gem
+
+# RubyGems
+Gemfile.lock
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local configuration (add your credentials here, never commit!)
+config/credentials.yml
+.env
+.env.local
+tags

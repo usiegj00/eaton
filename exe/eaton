@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "eaton"
+
+Eaton::CLI.start(ARGV)
