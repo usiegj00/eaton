@@ -39,7 +39,7 @@ module Eaton
         @session = data["session"]
         @token
       else
-        raise AuthenticationError, "Authentication failed: #{response.body}"
+        handle_auth_error(response)
       end
     rescue JSON::ParserError => e
       raise AuthenticationError, "Invalid response from server: #{e.message}"
@@ -82,6 +82,65 @@ module Eaton
     end
 
     private
+
+    def handle_auth_error(response)
+      begin
+        error_data = JSON.parse(response.body)
+
+        # Check for expired credentials error
+        if error_data["code"] == 112 && error_data["description"] =~ /expired/i
+          policy = parse_password_policy(error_data["args"])
+          message = build_expired_credentials_message(policy)
+          raise AuthenticationError, message
+        end
+      rescue JSON::ParserError
+        # Fall through to generic error
+      end
+
+      # Generic authentication error
+      raise AuthenticationError, "Authentication failed: #{response.body}"
+    end
+
+    def parse_password_policy(args)
+      return nil unless args && args.is_a?(Array) && args.length >= 7
+
+      {
+        min_length: args[0],
+        max_length: args[1],
+        require_uppercase: args[2] == 1,
+        require_lowercase: args[3] == 1,
+        require_numbers: args[4] == 1,
+        require_special: args[5] == 1,
+        special_chars: args[6]
+      }
+    end
+
+    def build_expired_credentials_message(policy)
+      message = "Credentials are expired. Please change the password via the PDU web interface.\n\n"
+
+      if policy
+        message += "Password requirements:\n"
+        message += "  - Length: #{policy[:min_length]}-#{policy[:max_length]} characters\n"
+
+        requirements = []
+        requirements << "uppercase letters" if policy[:require_uppercase]
+        requirements << "lowercase letters" if policy[:require_lowercase]
+        requirements << "numbers" if policy[:require_numbers]
+        requirements << "special characters" if policy[:require_special]
+
+        message += "  - Must include: #{requirements.join(', ')}\n" if requirements.any?
+        message += "  - Allowed special characters: #{policy[:special_chars]}\n" if policy[:special_chars]
+        message += "\n"
+      end
+
+      message += "To change password:\n"
+      message += "  1. Navigate to https://#{@host}#{@port == 443 ? '' : ":#{@port}"}\n"
+      message += "  2. Log in with current credentials\n"
+      message += "  3. Follow prompts to change password\n"
+      message += "\nNote: First-time login may require password change before API access is granted."
+
+      message
+    end
 
     def http_connection
       @http_connection ||= begin
