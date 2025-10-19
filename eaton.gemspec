@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name = "eaton"
   spec.version = Eaton::VERSION
   spec.authors = ["Jonathan Siegel"]
-  spec.email = ["jonathan@example.com"]
+  spec.email = ["<248302+usiegj00@users.noreply.github.com>"]
 
   spec.summary = "Ruby gem and CLI for managing Eaton Rack PDU G4 devices via REST API"
   spec.description = "Comprehensive power monitoring and management for Eaton Rack PDU G4 devices. Features include overall power consumption, per-outlet monitoring, branch distribution, detailed metrics (voltage, current, power factor), OAuth2 authentication, and SSH tunneling support."
