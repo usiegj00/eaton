@@ -11,6 +11,7 @@ module Eaton
     class APIError < StandardError; end
 
     include Power
+    include Network
 
     attr_reader :host, :username, :base_url
 
@@ -62,6 +63,16 @@ module Eaton
       authenticate! unless authenticated?
 
       request = Net::HTTP::Post.new("#{@base_path}#{path}")
+      add_auth_headers(request)
+      request.body = data.to_json
+
+      handle_response(execute_request(request))
+    end
+
+    def put(path, data = {})
+      authenticate! unless authenticated?
+
+      request = Net::HTTP::Put.new("#{@base_path}#{path}")
       add_auth_headers(request)
       request.body = data.to_json
 

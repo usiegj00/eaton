@@ -2,6 +2,7 @@
 
 require_relative "eaton/version"
 require_relative "eaton/power"
+require_relative "eaton/network"
 require_relative "eaton/client"
 require_relative "eaton/cli"
 
